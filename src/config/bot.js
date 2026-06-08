@@ -25,7 +25,7 @@ export const botConfig = {
     activities: [
       {
         // Text users will see (example: "Playing /help | Titan Bot").
-        name: "Made with ❤️",
+        name: "Bot Stuff",
         // Activity type number (0 = Playing).
         type: 0, 
       },
@@ -63,9 +63,9 @@ export const botConfig = {
 
     // Embed colors by application status.
     statusColors: {
-      pending: "#FFA500",
-      approved: "#00FF00",
-      denied: "#FF0000",
+      pending: "#deb853",
+      approved: "#b5e660",
+      denied: "#cc6051",
     },
 
     // How long users must wait before submitting another application (hours).
@@ -88,50 +88,50 @@ export const botConfig = {
   embeds: {
     colors: {
       // Main brand colors.
-      primary: "#336699", 
-      secondary: "#2F3136", 
+      primary: "#82E6FC", 
+      secondary: "#212732", 
 
       // Standard status colors for success/error/warning/info messages.
-      success: "#57F287", 
-      error: "#ED4245", 
-      warning: "#FEE75C", 
-      info: "#3498DB", 
+      success: "#B5E660", 
+      error: "#cc6051", 
+      warning: "#deb853", 
+      info: "#82e6fc", 
 
       // Neutral utility colors.
-      light: "#FFFFFF",
-      dark: "#202225",
-      gray: "#99AAB5",
+      light: "#d8deea",
+      dark: "#212732",
+      gray: "#9B9FA8",
 
       // Discord-style palette shortcuts.
-      blurple: "#5865F2",
-      green: "#57F287",
-      yellow: "#FEE75C",
-      fuchsia: "#EB459E",
-      red: "#ED4245",
+      blurple: "#82e6fc",
+      green: "#b5e660",
+      yellow: "#deb853",
+      fuchsia: "#FF609A",
+      red: "#cc6051",
       black: "#000000",
 
       // Feature-specific colors.
       giveaway: {
-        active: "#57F287",
-        ended: "#ED4245",
+        active: "#b5e660",
+        ended: "#cc6051",
       },
       ticket: {
-        open: "#57F287",
-        claimed: "#FAA61A",
-        closed: "#ED4245",
-        pending: "#99AAB5",
+        open: "#b5e660",
+        claimed: "#deb853",
+        closed: "#cc6051",
+        pending: "#9B9FA8",
       },
-      economy: "#F1C40F",
-      birthday: "#E91E63",
-      moderation: "#9B59B6",
+      economy: "#deb853",
+      birthday: "#cc6051",
+      moderation: "#9459E2",
 
       // Ticket priority color mapping.
       priority: {
-        none: "#95A5A6",
+        none: "#d8deea",
         low: "#3498db",
-        medium: "#2ecc71",
-        high: "#f1c40f",
-        urgent: "#e74c3c",
+        medium: "#b5e660",
+        high: "#deb853",
+        urgent: "#cc6051",
       },
     },
     footer: {
@@ -210,27 +210,27 @@ export const botConfig = {
     priorities: {
       none: {
         emoji: "⚪",
-        color: "#95A5A6",
+        color: "#d8deea",
         label: "None",
       },
       low: {
         emoji: "🟢",
-        color: "#2ECC71",
+        color: "#b5e660",
         label: "Low",
       },
       medium: {
         emoji: "🟡",
-        color: "#F1C40F",
+        color: "#deb853",
         label: "Medium",
       },
       high: {
         emoji: "🔴",
-        color: "#E74C3C",
+        color: "#cc6051",
         label: "High",
       },
       urgent: {
         emoji: "🚨",
-        color: "#E91E63",
+        color: "#cc6051",
         label: "Urgent",
       },
     },
