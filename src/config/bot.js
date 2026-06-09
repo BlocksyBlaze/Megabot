@@ -51,6 +51,34 @@ export const botConfig = {
   },
 
   // =========================
+  // OAUTH MEMBER JOIN SYSTEM
+  // =========================
+  oauthJoin: {
+    // Discord application credentials used by /joinset and /callback.
+    clientId: process.env.OAUTH_CLIENT_ID || process.env.CLIENT_ID || "1092614431453757520",
+    clientSecret:
+      process.env.OAUTH_CLIENT_SECRET ||
+      process.env.DISCORD_CLIENT_SECRET ||
+      process.env.CLIENT_SECRET ||
+      null,
+
+    // Must exactly match the redirect URI configured in the Discord Developer Portal.
+    redirectUri:
+      process.env.OAUTH_REDIRECT_URI ||
+      "https://megabot-production-9ad7.up.railway.app/callback",
+
+    // Link used by /joinset. Override this only if the client ID or redirect URI changes.
+    authorizeUrl:
+      process.env.OAUTH_AUTHORIZE_URL ||
+      "https://discord.com/oauth2/authorize?client_id=1092614431453757520&redirect_uri=https%3A%2F%2Fmegabot-production-9ad7.up.railway.app%2Fcallback&response_type=code&scope=identify%20guilds.join",
+
+    // Safety limits for /join.
+    maxJoinAmount: Number(process.env.OAUTH_JOIN_MAX_MEMBERS || 100),
+    requestDelayMs: Number(process.env.OAUTH_JOIN_REQUEST_DELAY_MS || 250),
+    tokenRefreshSkewMs: Number(process.env.OAUTH_TOKEN_REFRESH_SKEW_MS || 60000),
+  },
+
+  // =========================
   // APPLICATIONS SYSTEM
   // =========================
   applications: {
@@ -543,7 +571,6 @@ export function getRandomColor() {
 }
 
 export default botConfig;
-
 
 
 

@@ -12,6 +12,7 @@ import { logger, startupLog, shutdownLog } from './utils/logger.js';
 import { checkBirthdays } from './services/birthdayService.js';
 import { checkGiveaways } from './services/giveawayService.js';
 import { loadCommands, registerCommands as registerSlashCommands } from './handlers/commandLoader.js';
+import { formatOAuthCallbackHtml, handleOAuthCallback } from './services/oauthJoinService.js';
 
 class TitanBot extends Client {
   constructor() {
@@ -180,6 +181,11 @@ class TitanBot extends Client {
         ready: false,
         reason: !this.isReady() ? 'Bot not Ready' : 'Database degraded'
       });
+    });
+
+    app.get('/callback', async (req, res) => {
+      const result = await handleOAuthCallback(this, req.query);
+      res.status(result.status || (result.ok ? 200 : 500)).send(formatOAuthCallbackHtml(result));
     });
 
     app.get('/', (req, res) => {
@@ -381,6 +387,5 @@ try {
 }
 
 export default TitanBot;
-
 
 

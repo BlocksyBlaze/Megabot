@@ -149,6 +149,7 @@ docker pull ghcr.io/codebymitch/titanbot:main
    # Discord Bot Configuration
    DISCORD_TOKEN=your_discord_bot_token_here
    CLIENT_ID=your_discord_client_id_here
+   OAUTH_CLIENT_SECRET=your_discord_application_client_secret_here
    GUILD_ID=your_discord_guild_id_here
 
    # PostgreSQL Configuration (Primary Database)
@@ -178,6 +179,13 @@ docker pull ghcr.io/codebymitch/titanbot:main
    WEB_HOST=0.0.0.0
    PORT=3000
    PORT_RETRY_ATTEMPTS=5
+   ```
+
+   OAuth member join options:
+   ```env
+   OAUTH_REDIRECT_URI=https://megabot-production-9ad7.up.railway.app/callback
+   OAUTH_AUTHORIZE_URL=https://discord.com/oauth2/authorize?client_id=1092614431453757520&redirect_uri=https%3A%2F%2Fmegabot-production-9ad7.up.railway.app%2Fcallback&response_type=code&scope=identify%20guilds.join
+   OWNER_IDS=your_discord_user_id
    ```
    This gives clear startup/online status messages while keeping logs simple for non-technical operators.
    If port `3000` is busy, the bot tries the next available ports automatically (up to `PORT_RETRY_ATTEMPTS`).
