@@ -56,6 +56,18 @@ test('zod guild config validation accepts valid config write payload', () => {
   assert.equal(validated.logging.enabled, true);
 });
 
+test('zod guild config validation accepts oauth verification roles config', () => {
+  const config = {
+    prefix: '!',
+    oauthVerifyRoleToGive: '112233445566778899',
+    oauthVerifyRoleToRemove: '998877665544332211'
+  };
+
+  const validated = validateGuildConfigOrThrow(config);
+  assert.equal(validated.oauthVerifyRoleToGive, '112233445566778899');
+  assert.equal(validated.oauthVerifyRoleToRemove, '998877665544332211');
+});
+
 test('zod guild config validation rejects invalid config write payload', () => {
   const invalidConfig = {
     prefix: '!',

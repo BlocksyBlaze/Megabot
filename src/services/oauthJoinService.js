@@ -274,6 +274,60 @@ export async function handleOAuthCallback(client, query = {}) {
       username: record.username
     });
 
+    const guildId = query.state ? String(query.state).trim() : null;
+    if (guildId && /^\d{17,20}$/.test(guildId)) {
+      try {
+        const guild = await client.guilds.fetch(guildId).catch(() => null);
+        if (guild) {
+          const member = await guild.members.fetch(record.userId).catch(() => null);
+          if (member) {
+            const { getGuildConfig } = await import('./guildConfig.js');
+            const guildConfig = await getGuildConfig(client, guildId).catch(() => null);
+
+            if (guildConfig) {
+              const giveRoleId = guildConfig.oauthVerifyRoleToGive;
+              const removeRoleId = guildConfig.oauthVerifyRoleToRemove;
+
+              if (giveRoleId) {
+                const roleToGive = guild.roles.cache.get(giveRoleId);
+                if (roleToGive) {
+                  await member.roles.add(roleToGive, 'OAuth Verification Successful').catch(err => {
+                    logger.error('Failed to add role to verified user in callback', {
+                      userId: member.id,
+                      roleId: giveRoleId,
+                      error: err.message
+                    });
+                  });
+                }
+              }
+
+              if (removeRoleId) {
+                const roleToRemove = guild.roles.cache.get(removeRoleId);
+                if (roleToRemove && member.roles.cache.has(removeRoleId)) {
+                  await member.roles.remove(roleToRemove, 'OAuth Verification Successful').catch(err => {
+                    logger.error('Failed to remove role from verified user in callback', {
+                      userId: member.id,
+                      roleId: removeRoleId,
+                      error: err.message
+                    });
+                  });
+                }
+              }
+            }
+          } else {
+            logger.warn('User not in guild for OAuth callback role assignment', {
+              userId: record.userId,
+              guildId
+            });
+          }
+        } else {
+          logger.warn('Guild not found for OAuth callback role assignment', { guildId });
+        }
+      } catch (err) {
+        logger.error('Error in OAuth callback role assignment:', err);
+      }
+    }
+
     return {
       ok: true,
       status: 200,

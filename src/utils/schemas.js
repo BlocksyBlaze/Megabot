@@ -62,7 +62,9 @@ export const GuildConfigSchema = z
     logging: LoggingConfigSchema.optional(),
     ticketLogging: TicketLoggingSchema.optional(),
     enableLogging: z.boolean().optional(),
-    verification: VerificationConfigSchema
+    verification: VerificationConfigSchema,
+    oauthVerifyRoleToGive: z.string().nullable().optional(),
+    oauthVerifyRoleToRemove: z.string().nullable().optional()
   })
   .passthrough();
 

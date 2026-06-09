@@ -17,7 +17,9 @@ const GUILD_CONFIG_DEFAULTS = {
         enabled: false,
         channelId: null,
         enabledEvents: {}
-    }
+    },
+    oauthVerifyRoleToGive: null,
+    oauthVerifyRoleToRemove: null
 };
 
 
