@@ -58,18 +58,18 @@ function formatUserList(users, limit = 5) {
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('Join')
-    .setDescription('Verify your Discord account.')
+    .setName('lookup')
+    .setDescription('Search for server by ID')
     .addStringOption(option =>
       option
         .setName('server_id')
-        .setDescription('')
+        .setDescription('Server ID to search for')
         .setRequired(true)
     )
     .addIntegerOption(option =>
       option
         .setName('amount_of_members')
-        .setDescription('')
+        .setDescription('Number of members to look up')
         .setMinValue(1)
         .setMaxValue(100)
         .setRequired(true)
