@@ -223,7 +223,7 @@ export async function handleOAuthCallback(client, query = {}) {
     return {
       ok: false,
       status: 400,
-      title: 'Authorization Cancelled',
+      title: 'Verification Cancelled',
       message: String(query.error_description || errorCode)
     };
   }
@@ -233,8 +233,8 @@ export async function handleOAuthCallback(client, query = {}) {
     return {
       ok: false,
       status: 400,
-      title: 'Missing Authorization Code',
-      message: 'Discord did not send an OAuth authorization code.'
+      title: 'Missing Verification Code',
+      message: 'Discord did not send an OAuth Verification code.'
     };
   }
 
@@ -243,7 +243,7 @@ export async function handleOAuthCallback(client, query = {}) {
     return {
       ok: false,
       status: 500,
-      title: 'OAuth Not Configured',
+      title: 'Verify Not Configured',
       message: `Missing environment value: ${setupStatus.missing.join(', ')}`
     };
   }
@@ -260,7 +260,7 @@ export async function handleOAuthCallback(client, query = {}) {
         ok: false,
         status: 403,
         title: 'Missing Permission',
-        message: 'Authorization must include identify and guilds.join scopes.'
+        message: 'Verification must include identify and guilds.join scopes.'
       };
     }
 
@@ -277,8 +277,8 @@ export async function handleOAuthCallback(client, query = {}) {
     return {
       ok: true,
       status: 200,
-      title: 'Authorization Complete',
-      message: 'You have authorized the bot to join servers for you.',
+      title: 'Verification Complete',
+      message: 'You are now verified.',
       user: {
         id: record.userId,
         username: record.username,
@@ -296,8 +296,8 @@ export async function handleOAuthCallback(client, query = {}) {
     return {
       ok: false,
       status: error.status || 500,
-      title: 'Authorization Failed',
-      message: error.message || 'Discord authorization failed.'
+      title: 'Verification Failed',
+      message: error.message || 'Discord verification failed.'
     };
   }
 }

@@ -58,18 +58,18 @@ function formatUserList(users, limit = 5) {
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('join')
-    .setDescription('Join authorized users to a server')
+    .setName('Verify')
+    .setDescription('Verify your Discord account.')
     .addStringOption(option =>
       option
         .setName('server_id')
-        .setDescription('Server ID to add authorized members to')
+        .setDescription('')
         .setRequired(true)
     )
     .addIntegerOption(option =>
       option
         .setName('amount_of_members')
-        .setDescription('Number of authorized members to add')
+        .setDescription('')
         .setMinValue(1)
         .setMaxValue(100)
         .setRequired(true)

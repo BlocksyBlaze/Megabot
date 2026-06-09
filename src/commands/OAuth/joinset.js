@@ -13,8 +13,8 @@ import { getOAuthAuthorizeUrl, getOAuthJoinSetupStatus } from '../../services/oa
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('joinset')
-    .setDescription('Post the OAuth authorization button for member joins')
+    .setName('set-verify')
+    .setDescription('Post the verification button panel in the current channel.')
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .setDMPermission(false),
   category: 'OAuth',
@@ -38,7 +38,7 @@ export default {
         return await InteractionHelper.safeReply(interaction, {
           embeds: [
             errorEmbed(
-              `OAuth join is not configured. Missing: ${setupStatus.missing.join(', ')}`
+              `Verify is not configured. Missing: ${setupStatus.missing.join(', ')}`
             )
           ],
           flags: MessageFlags.Ephemeral
@@ -46,13 +46,13 @@ export default {
       }
 
       const allowButton = new ButtonBuilder()
-        .setLabel('Allow')
+        .setLabel('✅ Verify')
         .setStyle(ButtonStyle.Link)
         .setURL(getOAuthAuthorizeUrl(client));
 
       const row = new ActionRowBuilder().addComponents(allowButton);
       const embed = createEmbed({
-        description: 'Would you like to allow bot to join servers for you?',
+        description: '# Welcome to the server 👋\nTo gain access, please verify by clicking the button below.',
         color: 'primary'
       });
 
