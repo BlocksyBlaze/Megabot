@@ -58,7 +58,7 @@ function formatUserList(users, limit = 5) {
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('Verify')
+    .setName('Verify-Members')
     .setDescription('Verify your Discord account.')
     .addStringOption(option =>
       option
