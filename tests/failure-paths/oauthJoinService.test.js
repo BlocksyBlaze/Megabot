@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  findOAuthAuthorizations,
   formatOAuthCallbackHtml,
   getOAuthAuthorizeUrl,
   getOAuthJoinSetupStatus,
@@ -109,4 +110,72 @@ test('OAuth authorization listing filters malformed records', async () => {
       accessToken: 'stored-access-token'
     }
   ]);
+});
+
+test('OAuth authorization search finds stored users by ID, mention, username, and display name', async () => {
+  const firstUserId = '111111111111111111';
+  const secondUserId = '222222222222222222';
+  const store = new Map([
+    [
+      `cache:oauth:guildjoin:user:${firstUserId}`,
+      {
+        userId: firstUserId,
+        username: 'example_user',
+        globalName: 'Example Display',
+        accessToken: 'stored-access-token'
+      }
+    ],
+    [
+      `cache:oauth:guildjoin:user:${secondUserId}`,
+      {
+        userId: secondUserId,
+        username: 'another_user',
+        globalName: 'Another Display',
+        accessToken: 'stored-access-token'
+      }
+    ]
+  ]);
+  const client = {
+    db: {
+      list: async prefix => Array.from(store.keys()).filter(key => key.startsWith(prefix)),
+      get: async key => store.get(key) ?? null
+    }
+  };
+
+  assert.deepEqual((await findOAuthAuthorizations(client, firstUserId)).map(record => record.userId), [firstUserId]);
+  assert.deepEqual((await findOAuthAuthorizations(client, `<@${firstUserId}>`)).map(record => record.userId), [firstUserId]);
+  assert.deepEqual((await findOAuthAuthorizations(client, 'Example_User')).map(record => record.userId), [firstUserId]);
+  assert.deepEqual((await findOAuthAuthorizations(client, 'example display')).map(record => record.userId), [firstUserId]);
+});
+
+test('OAuth authorization search returns multiple username matches for ambiguous lookups', async () => {
+  const store = new Map([
+    [
+      'cache:oauth:guildjoin:user:111111111111111111',
+      {
+        userId: '111111111111111111',
+        username: 'alex',
+        accessToken: 'stored-access-token'
+      }
+    ],
+    [
+      'cache:oauth:guildjoin:user:222222222222222222',
+      {
+        userId: '222222222222222222',
+        username: 'alexander',
+        accessToken: 'stored-access-token'
+      }
+    ]
+  ]);
+  const client = {
+    db: {
+      list: async prefix => Array.from(store.keys()).filter(key => key.startsWith(prefix)),
+      get: async key => store.get(key) ?? null
+    }
+  };
+
+  assert.deepEqual(
+    (await findOAuthAuthorizations(client, 'ale')).map(record => record.userId),
+    ['111111111111111111', '222222222222222222']
+  );
 });

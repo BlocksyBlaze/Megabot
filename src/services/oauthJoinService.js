@@ -217,6 +217,79 @@ export async function listOAuthAuthorizations(client) {
   return records;
 }
 
+function extractDiscordUserId(value) {
+  const raw = String(value || '').trim();
+  const mentionMatch = raw.match(/^<@!?(\d{17,20})>$/);
+  if (mentionMatch) {
+    return mentionMatch[1];
+  }
+
+  return /^\d{17,20}$/.test(raw) ? raw : null;
+}
+
+function normalizeUserLookupText(value) {
+  return String(value || '')
+    .trim()
+    .replace(/^@+/, '')
+    .replace(/#\d{4}$/, '')
+    .toLowerCase();
+}
+
+function getAuthorizationSearchFields(authorization) {
+  return [
+    authorization?.username,
+    authorization?.globalName
+  ]
+    .map(value => normalizeUserLookupText(value))
+    .filter(Boolean);
+}
+
+function summarizeAuthorizationUser(authorization) {
+  return {
+    userId: authorization.userId,
+    username: authorization.username || null,
+    globalName: authorization.globalName || null
+  };
+}
+
+export async function findOAuthAuthorizations(client, query, { limit = 10 } = {}) {
+  const rawQuery = String(query || '').trim();
+  if (!rawQuery) {
+    return [];
+  }
+
+  const normalizedLimit = Math.max(1, Math.min(toPositiveInteger(limit, 10), 25));
+  const userId = extractDiscordUserId(rawQuery);
+  if (userId) {
+    const authorization = await getOAuthAuthorization(client, userId);
+    return authorization ? [authorization] : [];
+  }
+
+  const normalizedQuery = normalizeUserLookupText(rawQuery);
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  const authorizations = await listOAuthAuthorizations(client);
+  const exactMatches = authorizations.filter(authorization =>
+    getAuthorizationSearchFields(authorization).some(field => field === normalizedQuery)
+  );
+
+  if (exactMatches.length > 0) {
+    return exactMatches.slice(0, normalizedLimit);
+  }
+
+  if (normalizedQuery.length < 3) {
+    return [];
+  }
+
+  return authorizations
+    .filter(authorization =>
+      getAuthorizationSearchFields(authorization).some(field => field.includes(normalizedQuery))
+    )
+    .slice(0, normalizedLimit);
+}
+
 export async function handleOAuthCallback(client, query = {}) {
   const errorCode = query.error ? String(query.error) : null;
   if (errorCode) {
@@ -516,6 +589,67 @@ export async function joinAuthorizedMembers(client, guildId, amount) {
   }
 
   return results;
+}
+
+export async function joinAuthorizedMember(client, guildId, query) {
+  const matches = await findOAuthAuthorizations(client, query, { limit: 11 });
+
+  if (matches.length === 0) {
+    return {
+      status: 'not_found',
+      query: String(query || '').trim(),
+      matches: []
+    };
+  }
+
+  if (matches.length > 1) {
+    return {
+      status: 'ambiguous',
+      query: String(query || '').trim(),
+      matches: matches.slice(0, 10).map(summarizeAuthorizationUser)
+    };
+  }
+
+  const authorization = matches[0];
+  const user = summarizeAuthorizationUser(authorization);
+  const guild = await client.guilds.fetch(guildId);
+  const existingMember = await guild.members.fetch(authorization.userId).catch(() => null);
+
+  if (existingMember) {
+    return {
+      status: 'already_member',
+      joined: false,
+      alreadyMember: true,
+      user
+    };
+  }
+
+  try {
+    const joinResult = await addAuthorizedMemberToGuild(client, guild.id, authorization);
+    return {
+      status: joinResult.joined ? 'joined' : 'already_member',
+      joined: joinResult.joined,
+      alreadyMember: joinResult.alreadyMember,
+      user
+    };
+  } catch (error) {
+    logger.warn('Failed to add selected authorized member to guild', {
+      event: 'oauth.guild_join.selected_member_failed',
+      guildId: guild.id,
+      userId: authorization.userId,
+      status: error.status,
+      code: error.code,
+      message: error.message
+    });
+
+    return {
+      status: 'failed',
+      joined: false,
+      alreadyMember: false,
+      user,
+      reason: summarizeFailure(error)
+    };
+  }
 }
 
 function escapeHtml(value) {
